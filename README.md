@@ -20,6 +20,8 @@ Choose multiple branches from a list and delete them with ease.
 
 ## Uninstall
 
+To unlink the tool globally, run:
+
 ```
 npm unlink
 ```
