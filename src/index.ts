@@ -18,7 +18,8 @@ async function main() {
 
     const selectedBranches = await checkbox({
       message: '削除するブランチを選んでください（スペースキーで選択）：',
-      choices: branchNames.map(branch => ({name: branch, value: branch}))
+      choices: branchNames.map(branch => ({name: branch, value: branch})),
+      pageSize: branchNames.length
     });
 
     if (selectedBranches.length === 0) {
