@@ -25,3 +25,8 @@ To unlink the tool globally, run:
 ```
 npm unlink
 ```
+
+## License
+
+This project is licensed under the MIT License.
+See the [LICENSE](./LICENSE) file for details.
