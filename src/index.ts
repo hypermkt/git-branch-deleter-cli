@@ -48,7 +48,12 @@ async function main() {
     console.log('選択したすべてのブランチを削除しました')
 
   } catch (error) {
-    console.error('エラーが発生しました: ', error)
+    if (error instanceof Error && error.name === 'ExitPromptError') {
+      console.log("キャンセルしました");
+      process.exit(0);
+    } else {
+      console.error('エラーが発生しました: ', error)
+    }
   }
 }
 
