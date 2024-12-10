@@ -17,6 +17,7 @@
   "dependencies": {
     "@inquirer/checkbox": "^4.0.3",
     "@inquirer/prompts": "^7.2.0",
-    "@inquirer/select": "^4.0.3"
+    "@inquirer/select": "^4.0.3",
+    "simple-git": "^3.27.0"
   }
 }
