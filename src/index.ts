@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import simpleGit from 'simple-git';
 import select from '@inquirer/select';
 import checkbox from '@inquirer/checkbox';
