@@ -26,6 +26,14 @@ To unlink the tool globally, run:
 npm unlink
 ```
 
+## Usage
+
+Run the following command to start the tool:
+
+```
+git-branch-deleter
+```
+
 ## License
 
 This project is licensed under the MIT License.
