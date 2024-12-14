@@ -40,27 +40,16 @@ async function main() {
       return;
     }
   
-    const errors : { branch: string; message: string }[] = [];
     for (const branch of selectedBranches) {
       try {
-        await git.deleteLocalBranch(branch);
+        await git.branch(['-D', branch]);
         console.log(`ブランチ ${branch} を削除しました`)
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        errors.push({ branch, message: errorMessage });
+        console.error(`ブランチの削除に失敗しました: `, error)
       }
     }
 
-    if (errors.length > 0) {
-      console.log('ブランチの削除に失敗しました。')
-      errors.forEach(({ branch, message}) => {
-        if (message.includes('not fully merged')) {
-          console.error(`  => ブランチ ${branch}は未マージです。強制削除をするには'git branch -D ${branch}' を実行してください。`);
-        }
-      });
-    } else {
-      console.log('選択したすべてのブランチを削除しました')
-    }
+    console.log('選択したすべてのブランチを削除しました')
   } catch (error) {
     if (error instanceof Error && error.name === 'ExitPromptError') {
       console.log("キャンセルしました");
