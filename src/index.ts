@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 import { loadConfig } from './config';
 import { getDeletableBranches, deleteBranch } from './gitService';
+import { selectBranches, confirmBranch } from './prompt';
 import path from 'path';
-import select from '@inquirer/select';
-import checkbox from '@inquirer/checkbox';
 
 const configPath = path.resolve(__dirname, '../config.json');
 
@@ -13,43 +12,29 @@ async function main() {
     const config = await loadConfig(configPath);
     const protectedBranches = config.protectedBranches;
 
-    const deletableBranches = await getDeletableBranches(protectedBranches); 
+    const deletableBranches = await getDeletableBranches(protectedBranches);
 
     if (deletableBranches.length === 0) {
-      console.log('削除可能なブランチはありません。');
+      console.log('No branches available for deletion.');
       return;
     }
 
-    const selectedBranches = await checkbox({
-      message: '削除するブランチを選んでください（スペースキーで選択）：',
-      choices: deletableBranches.map((branch) => ({
-        name: branch,
-        value: branch,
-      })),
-      pageSize: deletableBranches.length,
-    });
+    const selectedBranches = await selectBranches(deletableBranches);
 
     if (selectedBranches.length === 0) {
-      console.log('削除するブランチが選択されていません');
+      console.log('No branches selected for deletion.');
       return;
     }
 
-    const confirmation = await select({
-      message: `以下のブランチを削除しますか？\n${selectedBranches.join('\n')}\n選択してください。`,
-      choices: [
-        { name: 'はい', value: true },
-        { name: 'いいえ', value: false },
-      ],
-    });
-
+    const confirmation = await confirmBranch(selectedBranches);
     if (!confirmation) {
-      console.log('削除をキャンセルしました。');
+      console.log('Deletion canceled.');
       return;
     }
 
     for (const branch of selectedBranches) {
       try {
-        deleteBranch(branch)
+        deleteBranch(branch);
         console.log(`ブランチ ${branch} を削除しました`);
       } catch (error) {
         console.error(`ブランチの削除に失敗しました: `, error);
