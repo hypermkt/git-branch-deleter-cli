@@ -5,7 +5,7 @@ export async function selectBranches(
   deletableBranches: string[]
 ): Promise<string[]> {
   return await checkbox({
-    message: '削除するブランチを選んでください（スペースキーで選択）：',
+    message: 'Select branches to delete):',
     choices: deletableBranches.map((branch) => ({
       name: branch,
       value: branch,
@@ -18,10 +18,10 @@ export async function confirmBranch(
   selectedBranches: string[]
 ): Promise<boolean> {
   return await select({
-    message: `以下のブランチを削除しますか？\n${selectedBranches.join('\n')}\n選択してください。`,
+    message: `Do you want to delete these branches?\n${selectedBranches.join('\n')}`,
     choices: [
-      { name: 'はい', value: true },
-      { name: 'いいえ', value: false },
+      { name: 'Yes', value: true },
+      { name: 'No', value: false },
     ],
   });
 }

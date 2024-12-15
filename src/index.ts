@@ -33,21 +33,15 @@ async function main() {
     }
 
     for (const branch of selectedBranches) {
-      try {
-        deleteBranch(branch);
-        console.log(`ブランチ ${branch} を削除しました`);
-      } catch (error) {
-        console.error(`ブランチの削除に失敗しました: `, error);
-      }
+      deleteBranch(branch);
+      console.log(`Deleted branch: ${branch}`);
     }
-
-    console.log('選択したすべてのブランチを削除しました');
   } catch (error) {
     if (error instanceof Error && error.name === 'ExitPromptError') {
-      console.log('キャンセルしました');
+      console.log('Cancelled');
       process.exit(0);
     } else {
-      console.error('エラーが発生しました: ', error);
+      console.error('An error occurred:', error);
     }
   }
 }
