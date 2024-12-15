@@ -1,6 +1,8 @@
 import { promises as fs } from 'fs';
 
-export async function loadConfig(configPath: string): Promise< { protectedBranches: string[] }> {
+export async function loadConfig(
+  configPath: string
+): Promise<{ protectedBranches: string[] }> {
   try {
     const data = await fs.readFile(configPath, 'utf-8');
     return JSON.parse(data);

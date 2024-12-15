@@ -1,6 +1,8 @@
 import { simpleGit } from 'simple-git';
 
-export async function getDeletableBranches(protectedBranches: string[]): Promise<string[]> {
+export async function getDeletableBranches(
+  protectedBranches: string[]
+): Promise<string[]> {
   const git = simpleGit();
 
   // Retrieve the list of Git branches
