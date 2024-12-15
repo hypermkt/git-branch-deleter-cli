@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { promises as fs } from 'fs';
+import { loadConfig } from './config';
 import path from 'path';
 import simpleGit from 'simple-git';
 import select from '@inquirer/select';
@@ -8,20 +8,10 @@ import checkbox from '@inquirer/checkbox';
 const git = simpleGit();
 const configPath = path.resolve(__dirname, '../config.json');
 
-async function loadConfig() {
-  try {
-    const data = await fs.readFile(configPath, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('設定ファイルの読み込みに失敗しました:', error);
-    return { protectedBranches: [] }; // 設定ファイルが読み込めない場合のデフォルト
-  }
-}
-
 async function main() {
   try {
     // Load the configuration file
-    const config = await loadConfig();
+    const config = await loadConfig(configPath);
     const protectedBranches = config.protectedBranches;
 
     // Retrieve the list of Git branches
