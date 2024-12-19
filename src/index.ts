@@ -1,86 +1,47 @@
 #!/usr/bin/env node
-import { promises as fs } from 'fs';
+import { loadConfig } from './config';
+import { getDeletableBranches, deleteBranch } from './gitService';
+import { selectBranches, confirmBranch } from './prompt';
 import path from 'path';
-import simpleGit from 'simple-git';
-import select from '@inquirer/select';
-import checkbox from '@inquirer/checkbox';
 
-const git = simpleGit();
 const configPath = path.resolve(__dirname, '../config.json');
-
-async function loadConfig() {
-  try {
-    const data = await fs.readFile(configPath, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('設定ファイルの読み込みに失敗しました:', error);
-    return { protectedBranches: [] }; // 設定ファイルが読み込めない場合のデフォルト
-  }
-}
 
 async function main() {
   try {
     // Load the configuration file
-    const config = await loadConfig();
+    const config = await loadConfig(configPath);
     const protectedBranches = config.protectedBranches;
 
-    // Retrieve the list of Git branches
-    const branches = await git.branchLocal();
-
-    // protectedBranchesに含まれるブランチを除外
-    const deletableBranches = branches.all.filter(
-      (branch) =>
-        !protectedBranches.includes(branch) && branch !== branches.current
-    );
+    const deletableBranches = await getDeletableBranches(protectedBranches);
 
     if (deletableBranches.length === 0) {
-      console.log('削除可能なブランチはありません。');
+      console.log('No branches available for deletion.');
       return;
     }
 
-    const selectedBranches = await checkbox({
-      message: '削除するブランチを選んでください（スペースキーで選択）：',
-      choices: deletableBranches.map((branch) => ({
-        name: branch,
-        value: branch,
-      })),
-      pageSize: deletableBranches.length,
-    });
+    const selectedBranches = await selectBranches(deletableBranches);
 
     if (selectedBranches.length === 0) {
-      console.log('削除するブランチが選択されていません');
+      console.log('No branches selected for deletion.');
       return;
     }
 
-    const confirmation = await select({
-      message: `以下のブランチを削除しますか？\n${selectedBranches.join('\n')}\n選択してください。`,
-      choices: [
-        { name: 'はい', value: true },
-        { name: 'いいえ', value: false },
-      ],
-    });
-
+    const confirmation = await confirmBranch(selectedBranches);
     if (!confirmation) {
-      console.log('削除をキャンセルしました。');
+      console.log('Deletion canceled.');
       return;
     }
 
     for (const branch of selectedBranches) {
-      try {
-        await git.branch(['-D', branch]);
-        console.log(`ブランチ ${branch} を削除しました`);
-      } catch (error) {
-        console.error(`ブランチの削除に失敗しました: `, error);
-      }
+      deleteBranch(branch);
+      console.log(`Deleted branch: ${branch}`);
     }
-
-    console.log('選択したすべてのブランチを削除しました');
   } catch (error) {
     if (error instanceof Error && error.name === 'ExitPromptError') {
-      console.log('キャンセルしました');
+      console.log('Cancelled');
       process.exit(0);
     } else {
-      console.error('エラーが発生しました: ', error);
+      console.error('An error occurred:', error);
     }
   }
 }
